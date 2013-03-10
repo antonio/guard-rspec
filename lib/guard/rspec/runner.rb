@@ -39,9 +39,17 @@ module Guard
 
         if drb_used?
           run_via_drb(paths, options)
+        elsif zeus?
+          run_via_zeus(paths, options)
         else
           run_via_shell(paths, options)
         end
+      end
+
+      def run_via_zeus(paths, options)
+        args = rspec_arguments(paths, options).split
+        exit_status = ::RSpec::Core::Runner.run(args)
+        return exit_status == 0
       end
 
       def rspec_executable
@@ -204,7 +212,7 @@ module Guard
       end
 
       def zeus?
-        @options[:zeus] || false
+        ENV['ZEUS_MASTER_FD'] || @options[:zeus] || false
       end
 
       def parallel?
