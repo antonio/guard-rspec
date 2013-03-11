@@ -115,7 +115,9 @@ module Guard
       end
 
       def run_via_shell(paths, options)
-        success = system(rspec_command(paths, options))
+        args = rspec_arguments(paths, options).split
+        exit_status = ::RSpec::Core::Runner.run(args)
+        success = exit_status == 0
 
         if @options[:notification] && !drb_used? && !success && rspec_command_exited_with_an_exception?
           Notifier.notify("Failed", :title => "RSpec results", :image => :failed, :priority => 2)
